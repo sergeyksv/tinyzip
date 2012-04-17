@@ -1,0 +1,22 @@
+{
+  "author": "Sergey Korotkov <sergeyksv@gmail.com>",
+  "name": "tinyzip",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sergeyksv/tinyzip.git"
+  },
+  "contributors": [
+  ],
+  "main": "./tinyzip",
+  "engines": {
+    "node": ">= v0.6.x"
+  },
+  "dependencies": {
+	"underscore": ""
+  },
+  "scripts": {
+  },
+  "devDependencies": {
+  }
+}
