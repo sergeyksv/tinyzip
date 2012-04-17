@@ -216,7 +216,6 @@ var ZipFileStream = function (zipFile) {
 					process.nextTick(pumpData);
 			}
 		} else if (state=="FILE_SENDHEADER") {
-			console.log(file.meta.file);
 			if (!file.meta.rootpath)
 				file.name = new Buffer(file.meta.file,  file.meta.utf8?'utf8':'ascii');
 			else
