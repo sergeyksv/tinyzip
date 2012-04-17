@@ -29,12 +29,13 @@ function(req, res, next){
 Constrouct new ZipFile object, accept global options that will be available for all files
 
 ### addFile(options)
-Add file into archive. *options* can have following attributes:
-* file - path to file
-* utf8 - true/false, when true force usage of utf8 for file names
-* fast - true/false, force usage zip file option to not put stream info in trailer which allows to stream compression of file reading. When false each file inside archive will be fetched into memory and compressed also as single block
-* compress - false/deflate_options_obj, for example set the maximum compression {level:9}
-* rootpath - false/somepath, when not false used to build relative names inside archive. 
+Add file into archive. **options** can have following attributes:
+
+* **file** - path to file
+* **utf8** - true/false, when true force usage of utf8 for file names
+* **fast** - true/false, force usage zip file option to not put stream info in trailer which allows to stream compression of file reading. When false each file inside archive will be fetched into memory and compressed also as single block
+* **compress** - false/deflate_options_obj, for example set the maximum compression {level:9}
+* **rootpath** - false/somepath, when not false used to build relative names inside archive. 
 
 ## getZipStream
 Return Read stream
