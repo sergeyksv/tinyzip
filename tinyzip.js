@@ -77,7 +77,7 @@ ZipFile.prototype._getFileHeader = function (file) {
 		file.uc = new Buffer(2+2+1+4+file.name.length);
 		idx = 0;
 		file.uc.writeInt16LE(0x7075,idx); idx+2;
-		file.uc.writeInt16LE(file.uc.length,idx); idx+=2;
+		file.uc.writeInt16LE(file.uc.length-4,idx); idx+=2;
 		file.uc.writeInt8(1, idx); idx++;
 		file.uc.writeInt32LE(this._crc32(file.name),idx); idx+=4;
 		writeBytes(file.uc,idx, file.name);
@@ -209,7 +209,7 @@ var ZipFileStream = function (zipFile) {
 						process.nextTick(pumpData);
 				})
 			} else {
-				file.compressSize = data.length;
+				file.compressSize = file.data.length;
 				file.compressCrc32 = zipFile._crc32(file.data);
 				state = "FILE_SENDHEADER";
 				if (!paused) 
@@ -286,13 +286,15 @@ var ZipFileStream = function (zipFile) {
 					process.nextTick(pumpData);
 			}
 		} else if (state=="FILE_SENDSIGN") {
-			var eof = new Buffer(16);
-			var idx = 0; 
-			idx = writeBytes(eof, idx, [ 0x08, 0x07, 0x4b, 0x50 ]);
-            eof.writeInt32LE(file.compressCrc32,idx); idx+=4;
-			eof.writeInt32LE(file.compressSize,idx); idx+=4;
-			eof.writeInt32LE(file.size,idx); idx+=4;
-			self.emit("data", eof);
+			var eof = null;
+			if (file.meta.fast) {
+				eof = new Buffer(12)
+				var idx = 0; 
+				eof.writeInt32LE(file.crc32,idx); idx+=4;
+				eof.writeInt32LE(file.compressSize,idx); idx+=4;
+				eof.writeInt32LE(file.size,idx); idx+=4;
+				self.emit("data", eof);
+			}
 			
             // now create dir
 			var dirBuffer = new Buffer(4 + 2 + file.header.length + 6 + 4 + 4 + file.name.length+(file.meta.utf8?file.uc.length:0));
@@ -311,7 +313,7 @@ var ZipFileStream = function (zipFile) {
 			if (file.meta.utf8) 
 				idx = writeBytes(dirBuffer, idx, file.uc);
 			directory.push(dirBuffer);
-			fileOffset += 4 + file.header.length + file.name.length + (file.meta.utf8?file.uc.length:0) + file.compressSize + 16;
+			fileOffset += 4 + file.header.length + file.name.length + (file.meta.utf8?file.uc.length:0) + file.compressSize + (eof?eof.length:0);
 			findex++;
 			state = "FILE_START";
 			if (!paused) 
